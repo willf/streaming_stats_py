@@ -5,7 +5,7 @@ streaming statistics on generators
 
 ## Description
 
-A longer description of your project goes here...
+Work in progress !
 
 
 <!-- pyscaffold-notes -->
