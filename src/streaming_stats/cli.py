@@ -31,6 +31,7 @@ __author__ = "Will Fitzgerald"
 __copyright__ = "Will Fitzgerald"
 __license__ = "MIT"
 
+# > ping 8.8.8.8 | ack -oh '\d+\.\d{2,}' --flush  | python src/streaming_stats/cli.py
 
 # ---- Python API ----
 # The functions defined in this section can be imported by users in their
@@ -68,6 +69,7 @@ def parse_args(args):
         dest="every",
         help="Print stats every nth value",
         type=int,
+        default=0,
     )
     return parser.parse_args(args)
 
@@ -81,9 +83,11 @@ def main():
         if stripped:
             value = float(line)
             stats.append(value)
-            if args.every and stats.n % args.every == 0:
+            if args.every and args.every > 0 and stats.n % args.every == 0:
                 print(json.dumps(stats.dict()))
+                sys.stdout.flush()
     print(json.dumps(stats.dict()))
+    sys.stdout.flush()
 
 
 
