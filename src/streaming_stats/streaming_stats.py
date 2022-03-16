@@ -1,10 +1,9 @@
 import math
-from collections import namedtuple
 from ddsketch import DDSketch
 
 __version__ = "0.1.0"
 
-SValue = namedtuple('SValue', ['v', 'g', 'delta'])
+
 class StreamingStats:
     GK_MAX_BAND = 999_999
 
