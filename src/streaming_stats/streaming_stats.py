@@ -1,9 +1,14 @@
 import math
+from collections import namedtuple
+from ddsketch import DDSketch
 
 __version__ = "0.1.0"
 
+SValue = namedtuple('SValue', ['v', 'g', 'delta'])
 class StreamingStats:
-    def __init__(self, epsilon=0.1):
+    GK_MAX_BAND = 999_999
+
+    def __init__(self, epsilon=0.01):
         self.epsilon = epsilon
         self.one_over_2e = 1 / (2 * epsilon)
         self.n = 0
@@ -12,20 +17,21 @@ class StreamingStats:
         self.min = None
         self.max = None
         self.sum = 0.0
-        self.S = []
+        self.sketch = DDSketch(epsilon)
 
-    def update(self, i):
+    def update(self, value):
         self.n += 1
-        self.sum += i
-        self.delta = i -self.mean
+        self.sum += value
+        self.delta = value - self.mean
         self.mean += (self.delta / self.n)
-        self.M2 += self.delta * (i - self.mean)
+        self.M2 += self.delta * (value - self.mean)
         if self.min is None or self.max is None:
-            self.min = i
-            self.max = i
+            self.min = value
+            self.max = value
         else:
-            self.min = min(self.min, i)
-            self.max = max(self.max, i)
+            self.min = min(self.min, value)
+            self.max = max(self.max, value)
+        self.sketch.add(value)
 
     def append(self, i):
         self.update(i)
@@ -57,6 +63,12 @@ class StreamingStats:
     def sum(self):
         return self.sum
 
+    def percentile(self, phi):
+        return self.sketch.get_quantile_value(phi)
+
+    def quantile(self, phi):
+        return self.percentile(phi)
+
     def dict(self):
         return {
             "n": self.n,
@@ -66,9 +78,19 @@ class StreamingStats:
             "min": self.min,
             "max": self.max,
             "sum": self.sum,
+            "1st": self.percentile(0.01),
+            "5th": self.percentile(0.05),
+            "10th": self.percentile(0.1),
+            "25th": self.percentile(0.25),
+            "50th": self.percentile(0.5),
+            "75th": self.percentile(0.75),
+            "90th": self.percentile(0.9),
+            "95th": self.percentile(0.95),
+            "99th": self.percentile(0.99),
         }
 
 
 def stats(iterable, accumulator=StreamingStats()):
     accumulator.extend(iterable)
     return accumulator.dict()
+
