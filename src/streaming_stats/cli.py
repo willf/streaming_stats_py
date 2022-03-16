@@ -75,8 +75,8 @@ def parse_args(args):
 
 
 
-def main():
-    args = parse_args(sys.argv[1:])
+def main(args = sys.argv[1:]):
+    args = parse_args(args)
     stats = streaming_stats.StreamingStats()
     for line in sys.stdin:
         stripped = line.strip()
