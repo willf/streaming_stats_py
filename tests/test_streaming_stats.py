@@ -1,25 +1,21 @@
 import pytest
 
-from streaming_stats.skeleton import fib, main
+from streaming_stats.streaming_stats import stats
+import math
 
 __author__ = "Will Fitzgerald"
 __copyright__ = "Will Fitzgerald"
 __license__ = "MIT"
 
 
-def test_fib():
-    """API Tests"""
-    assert fib(1) == 1
-    assert fib(2) == 1
-    assert fib(7) == 13
-    with pytest.raises(AssertionError):
-        fib(-10)
 
+def test_stats():
+    results = stats([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    assert results["n"] == 10
+    assert results["mean"] == 5.5
+    assert results["variance"] == 8.25
+    assert results["stddev"] == math.sqrt(results["variance"])
+    assert results["min"] == 1
+    assert results["max"] == 10
+    assert results["sum"] == 55
 
-def test_main(capsys):
-    """CLI Tests"""
-    # capsys is a pytest fixture that allows asserts agains stdout/stderr
-    # https://docs.pytest.org/en/stable/capture.html
-    main(["7"])
-    captured = capsys.readouterr()
-    assert "The 7-th Fibonacci number is 13" in captured.out
